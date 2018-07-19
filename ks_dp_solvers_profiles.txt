@@ -1,6 +1,6 @@
-++++++++++++
-Naive solver
-++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++
+Straightforward solver using nested `for` loops
++++++++++++++++++++++++++++++++++++++++++++++++
 
 Timer unit: 3.9473e-07 s
 
@@ -31,9 +31,9 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
     57         1          2.0      2.0      0.0      return solution_value, solution_weight, taken
 
 
-+++++++++++++++++++++
-Naive Detailed solver
-+++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Straightforward solver, inner loop broken down to individual operations
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Timer unit: 3.9473e-07 s
 
@@ -72,9 +72,9 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
     90         1          3.0      3.0      0.0      return solution_value, solution_weight, taken
 
 
-++++++++++++++++++
-Naive Nomax solver
-++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++
+Straightforward solver not using max function
++++++++++++++++++++++++++++++++++++++++++++++
 
 Timer unit: 3.9473e-07 s
 
@@ -110,9 +110,9 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
    120         1          3.0      3.0      0.0      return solution_value, solution_weight, taken
 
 
-+++++++++++++++++++++++++
-Naive solver with arrays
-+++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++
+Straightforward solver using Python arrays
+++++++++++++++++++++++++++++++++++++++++++
 
 Timer unit: 3.9473e-07 s
 
@@ -145,9 +145,9 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
    149         1          2.0      2.0      0.0      return solution_value, solution_weight, taken
 
 
-++++++++++++++++++++
-Naive solver with flat arrays
-++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++
+Straightforward solver with flat Python arrays
+++++++++++++++++++++++++++++++++++++++++++++++
 
 Timer unit: 3.9473e-07 s
 
@@ -180,9 +180,9 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
    177         1          4.0      4.0      0.0      return solution_value, solution_weight, taken
 
 
-++++++++++++++++++++
+++++++++++++++++
 Map-based solver
-++++++++++++++++++++
+++++++++++++++++
 
 Timer unit: 3.9473e-07 s
 
@@ -216,9 +216,9 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
    204         1          2.0      2.0      0.0      return solution_value, solution_weight, taken
 
 
-++++++++++++++++++
++++++++++++++++++++++++++++++++
 Map-based solver without lambda
-++++++++++++++++++
++++++++++++++++++++++++++++++++
 
 Timer unit: 3.9473e-07 s
 
@@ -257,9 +257,9 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
    237         1          3.0      3.0      0.0      return solution_value, solution_weight, taken
 
 
-++++++++++++++++++++
-List comprehension-based solver
-++++++++++++++++++++
++++++++++++++++++++++++++++++++
+Solver using list comprehension
++++++++++++++++++++++++++++++++
 
 Timer unit: 3.9473e-07 s
 
@@ -292,9 +292,10 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
    263
    264         1          2.0      2.0      0.0      return solution_value, solution_weight, taken
 
-+++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++
 List comprehension-based solver with numpy array
-+++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++
 
 Timer unit: 3.9473e-07 s
 
@@ -326,41 +327,81 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
    290
    291         1          2.0      2.0      0.0      return solution_value, solution_weight, taken
 
-+++++++++++++++++++
-Numpy solver
-+++++++++++++++++++
+
+++++++++++++++++++++++++++++++++
+Numpy arrays built in `for` loop
+++++++++++++++++++++++++++++++++
+
+Timer unit: 3.9473e-07 s
+
+Total time: 295.277 s
+File: ks_dp_solvers.py
+Function: solve_naive_numpy at line 298
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   298                                           def solve_naive_numpy(capacity, items, weights, values):
+   299
+   300         1         43.0     43.0      0.0      grid = np.empty((items + 1, capacity + 1), dtype=int)
+   301         1       3008.0   3008.0      0.0      grid[0] = 0
+   302       101        174.0      1.7      0.0      for item in range(items):
+   303       100     335658.0   3356.6      0.0          grid[item+1] = grid[item]
+   304       100       1210.0     12.1      0.0          this_weight = weights[item]
+   305       100        259.0      2.6      0.0          this_value = values[item]
+   306
+   307  98387558  177357543.0      1.8     23.7          for k in range(this_weight, capacity+1):
+   308  98387458  570347915.0      5.8     76.2              grid[item + 1, k] = max(grid[item, k], grid[item, k - this_weight] + this_value)
+   309
+   310         1         10.0     10.0      0.0      solution_value = grid[items][capacity]
+   311         1          2.0      2.0      0.0      solution_weight = 0
+   312         1          2.0      2.0      0.0      taken = []
+   313         1          2.0      2.0      0.0      k = capacity
+   314       101        164.0      1.6      0.0      for item in range(items, 0, -1):
+   315       100        523.0      5.2      0.0          if grid[item][k] != grid[item-1][k]:
+   316        80        223.0      2.8      0.0              taken.append(item - 1)
+   317        80        181.0      2.3      0.0              k -= weights[item - 1]
+   318        80        166.0      2.1      0.0              solution_weight += weights[item-1]
+   319
+   320         1          3.0      3.0      0.0      return solution_value, solution_weight, taken
+
+
+
++++++++++++++++++++++++++
+Proper numpy-based solver
++++++++++++++++++++++++++
 
 Timer unit: 3.9473e-07 s
 
 Total time: 0.553634 s
 File: ks_dp_solvers.py
-Function: solve_numpy_func at line 297
+Function: solve_numpy_func at line 327
 
 Line #      Hits         Time  Per Hit   % Time  Line Contents
 ==============================================================
-   297                                           def solve_numpy_func(capacity,items, weights, values):
-   298
-   299         1         40.0     40.0      0.0      grid = np.empty((items + 1, capacity + 1), dtype=int)
-   300         1       2441.0   2441.0      0.2      grid[0] = 0
-   301
-   302       101       1123.0     11.1      0.1      for item in range(items):
-   303       100        463.0      4.6      0.0          this_weight = weights[item]
-   304       100        254.0      2.5      0.0          this_value = values[item]
-   305       100       7500.0     75.0      0.5          grid[item+1, :this_weight] = grid[item, :this_weight]
-   306       100     374943.0   3749.4     26.7          temp = grid[item, :-this_weight] + this_value
-   307       100    1014621.0  10146.2     72.3          grid[item + 1, this_weight:] = np.where(temp > grid[item, this_weight:], temp, grid[item, this_weight:])
-   308
-   309         1         10.0     10.0      0.0      solution_value = grid[items, capacity]
-   310         1          2.0      2.0      0.0      solution_weight = 0
-   311         1          2.0      2.0      0.0      taken = []
-   312         1          2.0      2.0      0.0      k = capacity
-   313       101        170.0      1.7      0.0      for item in range(items, 0, -1):
-   314       100        465.0      4.7      0.0          if grid[item][k] != grid[item - 1][k]:
-   315        80        184.0      2.3      0.0              taken.append(item - 1)
-   316        80        178.0      2.2      0.0              k -= weights[item - 1]
-   317        80        165.0      2.1      0.0              solution_weight += weights[item-1]
-   318
-   319         1          2.0      2.0      0.0      return solution_value, solution_weight, taken
+   327                                           def solve_numpy_func(capacity,items, weights, values):
+   328
+   329         1         40.0     40.0      0.0      grid = np.empty((items + 1, capacity + 1), dtype=int)
+   330         1       2441.0   2441.0      0.2      grid[0] = 0
+   331
+   332       101       1123.0     11.1      0.1      for item in range(items):
+   333       100        463.0      4.6      0.0          this_weight = weights[item]
+   334       100        254.0      2.5      0.0          this_value = values[item]
+   335       100       7500.0     75.0      0.5          grid[item+1, :this_weight] = grid[item, :this_weight]
+   336       100     374943.0   3749.4     26.7          temp = grid[item, :-this_weight] + this_value
+   337       100    1014621.0  10146.2     72.3          grid[item + 1, this_weight:] = np.where(temp > grid[item, this_weight:], temp, grid[item, this_weight:])
+   338
+   339         1         10.0     10.0      0.0      solution_value = grid[items, capacity]
+   340         1          2.0      2.0      0.0      solution_weight = 0
+   341         1          2.0      2.0      0.0      taken = []
+   342         1          2.0      2.0      0.0      k = capacity
+   343       101        170.0      1.7      0.0      for item in range(items, 0, -1):
+   344       100        465.0      4.7      0.0          if grid[item][k] != grid[item - 1][k]:
+   345        80        184.0      2.3      0.0              taken.append(item - 1)
+   346        80        178.0      2.2      0.0              k -= weights[item - 1]
+   347        80        165.0      2.1      0.0              solution_weight += weights[item-1]
+   348
+   349         1          2.0      2.0      0.0      return solution_value, solution_weight, taken
+
 
 ++++++++++++++++++++++++
 Numpy solver with buffer
@@ -371,32 +412,32 @@ Timer unit: 3.9473e-07 s
 
 Total time: 0.657976 s
 File: ks_dp_solvers.py
-Function: solve_numpy_func_buffer at line 325
+Function: solve_numpy_func_buffer at line 355
 
 Line #      Hits         Time  Per Hit   % Time  Line Contents
 ==============================================================
-   325                                           def solve_numpy_func_buffer(capacity, items, weights, values):
-   326
-   327         1         40.0     40.0      0.0      grid = np.empty((items + 1, capacity + 1), dtype=int)
-   328         1       2463.0   2463.0      0.1      grid[0] = 0
-   329         1         68.0     68.0      0.0      temp = np.zeros(capacity+1, dtype=int)
-   330
-   331       101       1283.0     12.7      0.1      for item in range(items):
-   332       100        495.0      5.0      0.0          this_weight = weights[item]
-   333       100        243.0      2.4      0.0          this_value = values[item]
-   334       100       8189.0     81.9      0.5          grid[item+1, :this_weight] = grid[item, :this_weight]
-   335       100     546527.0   5465.3     32.8          temp[:capacity+1-this_weight] = grid[item, :-this_weight] + this_value
-   336       100    1106355.0  11063.5     66.4          grid[item + 1, this_weight:] = np.where(temp[:-this_weight] > grid[item, this_weight:], temp[:-this_weight], grid[item, this_weight:])
-   337
-   338         1         11.0     11.0      0.0      solution_value = grid[items, capacity]
-   339         1          2.0      2.0      0.0      solution_weight = 0
-   340         1          2.0      2.0      0.0      taken = []
-   341         1          2.0      2.0      0.0      k = capacity
-   342       101        172.0      1.7      0.0      for item in range(items, 0, -1):
-   343       100        490.0      4.9      0.0          if grid[item][k] != grid[item - 1][k]:
-   344        80        201.0      2.5      0.0              taken.append(item - 1)
-   345        80        186.0      2.3      0.0              k -= weights[item - 1]
-   346        80        170.0      2.1      0.0              solution_weight += weights[item-1]
-   347
-   348         1          3.0      3.0      0.0      return solution_value, solution_weight, taken
+   355                                           def solve_numpy_func_buffer(capacity, items, weights, values):
+   356
+   357         1         40.0     40.0      0.0      grid = np.empty((items + 1, capacity + 1), dtype=int)
+   358         1       2463.0   2463.0      0.1      grid[0] = 0
+   359         1         68.0     68.0      0.0      temp = np.zeros(capacity+1, dtype=int)
+   360
+   361       101       1283.0     12.7      0.1      for item in range(items):
+   362       100        495.0      5.0      0.0          this_weight = weights[item]
+   363       100        243.0      2.4      0.0          this_value = values[item]
+   364       100       8189.0     81.9      0.5          grid[item+1, :this_weight] = grid[item, :this_weight]
+   365       100     546527.0   5465.3     32.8          temp[:capacity+1-this_weight] = grid[item, :-this_weight] + this_value
+   366       100    1106355.0  11063.5     66.4          grid[item + 1, this_weight:] = np.where(temp[:-this_weight] > grid[item, this_weight:], temp[:-this_weight], grid[item, this_weight:])
+   367
+   368         1         11.0     11.0      0.0      solution_value = grid[items, capacity]
+   369         1          2.0      2.0      0.0      solution_weight = 0
+   370         1          2.0      2.0      0.0      taken = []
+   371         1          2.0      2.0      0.0      k = capacity
+   372       101        172.0      1.7      0.0      for item in range(items, 0, -1):
+   373       100        490.0      4.9      0.0          if grid[item][k] != grid[item - 1][k]:
+   374        80        201.0      2.5      0.0              taken.append(item - 1)
+   375        80        186.0      2.3      0.0              k -= weights[item - 1]
+   376        80        170.0      2.1      0.0              solution_weight += weights[item-1]
+   377
+   378         1          3.0      3.0      0.0      return solution_value, solution_weight, taken
 

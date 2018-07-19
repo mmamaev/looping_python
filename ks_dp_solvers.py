@@ -291,7 +291,37 @@ def solve_list_comp_numpy(capacity, items, weights, values):
     return solution_value, solution_weight, taken
 
 
-# This solver puts data into numpy arrays and uses numpy functions to process them.
+# List to ndarray conversion is the bottleneck. Let's return to the basics
+# and build numpy arrays in a ``for`` loop thus avoiding the costly conversion. 
+# This is proved disastrous. Nasdaq100 running time is 295 sec.    
+
+def solve_naive_numpy(capacity, items, weights, values):
+
+    grid = np.empty((items + 1, capacity + 1), dtype=int)
+    grid[0] = 0
+    for item in range(items):
+        grid[item+1] = grid[item]
+        this_weight = weights[item]
+        this_value = values[item]
+
+        for k in range(this_weight, capacity+1):
+            grid[item + 1, k] = max(grid[item, k], grid[item, k - this_weight] + this_value)
+
+    solution_value = grid[items][capacity]
+    solution_weight = 0
+    taken = []
+    k = capacity
+    for item in range(items, 0, -1):
+        if grid[item][k] != grid[item-1][k]:
+            taken.append(item - 1)
+            k -= weights[item - 1]
+            solution_weight += weights[item-1]
+
+    return solution_value, solution_weight, taken
+
+
+# This solver makes proper use of numpy. 
+# It puts data into numpy arrays and uses numpy functions to process them.
 # Nasdaq100 running time is 0.56s.
 
 def solve_numpy_func(capacity, items, weights, values):
@@ -382,6 +412,8 @@ def solve_numpy_func_recur(capacity, items, weights, values):
     return solution_value, solution_weight, taken
 
 
+
+
 if __name__ == '__main__':
 
     solvers = {
@@ -395,6 +427,7 @@ if __name__ == '__main__':
         'map-nolambda': solve_map_nolambda,
         'listcomp': solve_list_comp,
         'listcomp-numpy': solve_list_comp_numpy,
+        'naive-numpy': solve_naive_numpy,
         'numpy': solve_numpy_func,
         'numpy-b': solve_numpy_func_buffer,
         'numpy-r': solve_numpy_func_recur,
