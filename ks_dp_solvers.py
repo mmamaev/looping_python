@@ -442,6 +442,8 @@ if __name__ == '__main__':
     parser.add_argument('-f', default='nasdaq100list.csv', metavar='filename',
                         help='Name of CSV data file (default: %(default)s). '
                              'Data format: label, weight, value. No header line.')
+    parser.add_argument('-c', default=1000000, metavar='capacity',
+                        help='Knapsack capacity')
     parser.add_argument('solver', choices=list(solvers.keys()),
                         help='Solver implementation. Choose from %(choices)s')
     parser.add_argument('-m', action='store_true', default=False,
@@ -452,6 +454,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     verbose = args.v
     datafilename = args.f
+    capacity = int(args.c)
     solver = solvers[args.solver]
     profile_mem = args.m
     profile_time = args.t
@@ -461,9 +464,8 @@ if __name__ == '__main__':
     weights = []
     values = []
     items = 0
-    capacity = 1000000
+    
 
-    datafilename = 'nasdaq100list.csv'
     with open(datafilename, 'r') as file:
         data = file.read()
     for line in data.split('\n'):
